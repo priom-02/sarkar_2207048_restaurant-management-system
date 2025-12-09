@@ -11,21 +11,28 @@ import androidx.appcompat.app.AppCompatActivity;
 public class MainActivity extends AppCompatActivity {
 
     private Button btnAdmin;
-
+    private Button btnUser;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         btnAdmin = findViewById(R.id.btnAdmin);
-        if (btnAdmin != null) {
-            btnAdmin.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent i = new Intent(MainActivity.this, AdminLogin.class);
-                    startActivity(i);
-                }
-            });
-        }
+        btnUser = findViewById(R.id.btnUser);
+        btnAdmin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, AdminLogin.class);
+                startActivity(i);
+            }
+        });
+        btnUser.setOnClickListener(new View.OnClickListener() {;
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(MainActivity.this, UserLogin.class);
+                startActivity(i);
+            }
+        });
+
     }
 }
