@@ -32,6 +32,18 @@
         app:layout_constraintTop_toBottomOf="@id/tvTitle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+    <Button
+        android:id="@+id/btnSignin"
+        android:layout_width="0dp"
+        android:layout_height="38dp"
+        android:layout_marginTop="20dp"
+        android:backgroundTint="#00FF00"
+        android:text="Sign Up"
+        android:textColor="#ffffff"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvSubtitle" />
 
     <EditText
         android:id="@+id/etEmail"
@@ -46,18 +58,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <Button
-        android:id="@+id/btnSignin"
-        android:layout_width="0dp"
-        android:layout_height="38dp"
-        android:layout_marginTop="20dp"
-        android:backgroundTint="#00FF00"
-        android:text="Sign Up"
-        android:textColor="#ffffff"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tvSubtitle" />
+
 
     <EditText
         android:id="@+id/etPassword"
