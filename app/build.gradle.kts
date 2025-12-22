@@ -46,6 +46,7 @@ dependencies {
 
 
     implementation(libs.recyclerview)
+    implementation(libs.fragment)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
