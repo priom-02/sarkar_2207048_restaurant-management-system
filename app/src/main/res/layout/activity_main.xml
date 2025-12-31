@@ -8,59 +8,6 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="50dp"
-        android:background="@drawable/bg_for_main_activity">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Welcome Back"
-            android:textStyle="bold"
-            android:textSize="20sp"
-            android:textColor="#94a3b8" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:padding="4dp"
-            android:text="Restaurant Management"
-            android:textColor="#e6eef8"
-            android:textSize="26sp"
-            android:textStyle="bold" />
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="100dp" />
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_marginTop="18dp">
-
-            <Button
-                android:id="@+id/btnAdmin"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:text="Admin"
-                android:textStyle="bold"
-                android:backgroundTint="#2563eb"
-                android:textColor="#ffffff" />
-
-            <View
-                android:layout_width="20dp"
-                android:layout_height="20dp" />
-
-            <Button
-                android:id="@+id/btnUser"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_weight="1"
-                android:text="User"
-                android:textStyle="bold"
-                android:backgroundTint="#22c55e"
-                android:textColor="#ffffff" />
-
-        </LinearLayout>
-
+        android:background="@drawable/splashscreen">
     </LinearLayout>
 </LinearLayout>
