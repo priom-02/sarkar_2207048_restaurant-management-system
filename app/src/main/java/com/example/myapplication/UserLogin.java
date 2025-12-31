@@ -6,14 +6,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -21,7 +19,7 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class UserLogin extends AppCompatActivity {
-    private Button btnSignIn;
+    private TextView btnSignIn;
     EditText etEmail, etPassword;
     Button btnlogin;
     FirebaseAuth auth;
@@ -33,8 +31,8 @@ public class UserLogin extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_user_login);
         auth = FirebaseAuth.getInstance();
-        etEmail = findViewById(R.id.etEmail);
-        etPassword = findViewById(R.id.etPassword);
+        etEmail = findViewById(R.id.Email);
+        etPassword = findViewById(R.id.Password);
         btnSignIn = findViewById(R.id.btnSignin);
         btnlogin = findViewById(R.id.btnAction);
         progressBar = findViewById(R.id.progressBar3);
