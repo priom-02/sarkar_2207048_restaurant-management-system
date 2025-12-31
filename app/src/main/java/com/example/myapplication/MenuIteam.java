@@ -28,6 +28,7 @@ public class MenuIteam extends AppCompatActivity {
     private MenuItemAdapter adapter;
     private List<MenuItem> allMenuItems;
     private ChipGroup chipGroup;
+    private TextView viewOrderButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,9 +45,15 @@ public class MenuIteam extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.rv_menu_items);
         chipGroup = findViewById(R.id.chip_group);
+        viewOrderButton = findViewById(R.id.tvViewOrder);
 
         setupRecyclerView();
         setupChipGroupListener();
+
+        viewOrderButton.setOnClickListener(v -> {
+            Intent intent = new Intent(MenuIteam.this, CartActivity.class);
+            startActivity(intent);
+        });
     }
 
     @Override
@@ -98,7 +105,7 @@ public class MenuIteam extends AppCompatActivity {
         adapter.filterList(filteredList);
     }
 
-    private class MenuItem {
+    public static class MenuItem {
         private String name;
         private String price;
         private int imageResource;
@@ -148,10 +155,12 @@ public class MenuIteam extends AppCompatActivity {
                 intent.putExtra(MenuItemDetailActivity.EXTRA_ITEM_PRICE, item.getPrice());
                 intent.putExtra(MenuItemDetailActivity.EXTRA_ITEM_IMAGE, item.getImageResource());
                 intent.putExtra(MenuItemDetailActivity.EXTRA_ITEM_DESC, item.getDescription());
+                intent.putExtra(MenuItemDetailActivity.EXTRA_ITEM_CATEGORY, item.getCategory());
                 v.getContext().startActivity(intent);
             });
 
             holder.addToOrderButton.setOnClickListener(v -> {
+                CartManager.getInstance().addItem(item);
                 Toast.makeText(v.getContext(), "Added " + item.getName() + " to order", Toast.LENGTH_SHORT).show();
             });
         }
