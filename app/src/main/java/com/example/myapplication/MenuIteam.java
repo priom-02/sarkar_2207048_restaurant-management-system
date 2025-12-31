@@ -1,5 +1,6 @@
 package com.example.myapplication;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,28 +51,24 @@ public class MenuIteam extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(android.view.MenuItem item) {
-        // handle arrow click here
         if (item.getItemId() == android.R.id.home) {
-            finish(); // close this activity and return to previous activity (if there is any)
+            finish();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
     private void setupRecyclerView() {
-        // Initialize the master list of menu items
         allMenuItems = new ArrayList<>();
-        // In a real app, you'd fetch this from a database or API
-        allMenuItems.add(new MenuItem("Cheese Pizza", "$12.99", R.drawable.pizza, "Main Course"));
-        allMenuItems.add(new MenuItem("Classic Burger", "$8.99", R.drawable.burger, "Main Course"));
-        allMenuItems.add(new MenuItem("Sandwice", "$10.99", R.drawable.sandwich, "Main Course"));
-        allMenuItems.add(new MenuItem("Salad", "$7.99", R.drawable.salad, "Appetizers"));
-        allMenuItems.add(new MenuItem("Chocolate Cake", "$5.99", R.drawable.cake, "Desserts"));
-        allMenuItems.add(new MenuItem("Coffe", "$3.99", R.drawable.coffe, "Beverages"));
-        allMenuItems.add(new MenuItem("French Fries", "$4.50", R.drawable.fries, "Appetizers"));
-        allMenuItems.add(new MenuItem("Icecream", "$1.99", R.drawable.icecream, "Beverages"));
+        allMenuItems.add(new MenuItem("Cheese Pizza", "$12.99", R.drawable.pizza, "Main Course", "A classic cheese pizza with a rich tomato sauce and a blend of mozzarella and cheddar cheese."));
+        allMenuItems.add(new MenuItem("Classic Burger", "$8.99", R.drawable.burger, "Main Course", "A juicy beef patty with lettuce, tomato, onion, and our special sauce, served on a toasted bun."));
+        allMenuItems.add(new MenuItem("Sandwich", "$10.99", R.drawable.sandwich, "Main Course", "A delicious sandwich with your choice of fillings, served on freshly baked bread."));
+        allMenuItems.add(new MenuItem("Salad", "$7.99", R.drawable.salad, "Appetizers", "A fresh and healthy salad with a variety of greens and a light vinaigrette dressing."));
+        allMenuItems.add(new MenuItem("Chocolate Cake", "$5.99", R.drawable.cake, "Desserts", "A rich and moist chocolate cake with a decadent fudge frosting."));
+        allMenuItems.add(new MenuItem("Coffee", "$3.99", R.drawable.coffe, "Beverages", "A freshly brewed cup of coffee, perfect to start your day or as an after-meal treat."));
+        allMenuItems.add(new MenuItem("French Fries", "$4.50", R.drawable.fries, "Appetizers", "Crispy golden french fries, lightly salted and served hot."));
+        allMenuItems.add(new MenuItem("Ice Cream", "$1.99", R.drawable.icecream, "Desserts", "A scoop of our delicious ice cream, available in a variety of flavors."));
 
-        // The adapter is initially created with the full list
         adapter = new MenuItemAdapter(new ArrayList<>(allMenuItems));
 
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
@@ -101,44 +98,28 @@ public class MenuIteam extends AppCompatActivity {
         adapter.filterList(filteredList);
     }
 
-    // --- Inner classes for Data Model and Adapter ---
-
-    /**
-     * Data model for a single menu item
-     */
-    private static class MenuItem {
+    private class MenuItem {
         private String name;
         private String price;
         private int imageResource;
         private String category;
+        private String description;
 
-        public MenuItem(String name, String price, int imageResource, String category) {
+        public MenuItem(String name, String price, int imageResource, String category, String description) {
             this.name = name;
             this.price = price;
             this.imageResource = imageResource;
             this.category = category;
+            this.description = description;
         }
 
-        public String getName() {
-            return name;
-        }
-
-        public String getPrice() {
-            return price;
-        }
-
-        public int getImageResource() {
-            return imageResource;
-        }
-
-        public String getCategory() {
-            return category;
-        }
+        public String getName() { return name; }
+        public String getPrice() { return price; }
+        public int getImageResource() { return imageResource; }
+        public String getCategory() { return category; }
+        public String getDescription() { return description; }
     }
 
-    /**
-     * RecyclerView Adapter to display MenuItems
-     */
     private class MenuItemAdapter extends RecyclerView.Adapter<MenuItemAdapter.MenuItemViewHolder> {
 
         private List<MenuItem> menuItems;
@@ -160,6 +141,15 @@ public class MenuIteam extends AppCompatActivity {
             holder.itemName.setText(item.getName());
             holder.itemPrice.setText(item.getPrice());
             holder.itemImage.setImageResource(item.getImageResource());
+
+            holder.itemView.setOnClickListener(v -> {
+                Intent intent = new Intent(v.getContext(), MenuItemDetailActivity.class);
+                intent.putExtra(MenuItemDetailActivity.EXTRA_ITEM_NAME, item.getName());
+                intent.putExtra(MenuItemDetailActivity.EXTRA_ITEM_PRICE, item.getPrice());
+                intent.putExtra(MenuItemDetailActivity.EXTRA_ITEM_IMAGE, item.getImageResource());
+                intent.putExtra(MenuItemDetailActivity.EXTRA_ITEM_DESC, item.getDescription());
+                v.getContext().startActivity(intent);
+            });
 
             holder.addToOrderButton.setOnClickListener(v -> {
                 Toast.makeText(v.getContext(), "Added " + item.getName() + " to order", Toast.LENGTH_SHORT).show();
