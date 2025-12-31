@@ -6,6 +6,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +26,8 @@ public class UserLogin extends AppCompatActivity {
     Button btnlogin;
     FirebaseAuth auth;
     ProgressBar progressBar;
+    RadioGroup userTypeRadioGroup;
+    RadioButton radioUser, radioAdmin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +40,10 @@ public class UserLogin extends AppCompatActivity {
         btnSignIn = findViewById(R.id.btnSignin);
         btnlogin = findViewById(R.id.btnAction);
         progressBar = findViewById(R.id.progressBar3);
+        userTypeRadioGroup = findViewById(R.id.userTypeRadioGroup);
+        radioUser = findViewById(R.id.radioUser);
+        radioAdmin = findViewById(R.id.radioAdmin);
+
         btnlogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -59,9 +67,16 @@ public class UserLogin extends AppCompatActivity {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            Toast.makeText(UserLogin.this, "Logged in Successfully", Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(getApplicationContext(), UserDashboard.class));
-                            finish();
+                            int selectedId = userTypeRadioGroup.getCheckedRadioButtonId();
+                            if (selectedId == R.id.radioUser) {
+                                Toast.makeText(UserLogin.this, "Logged in Successfully as User", Toast.LENGTH_SHORT).show();
+                                startActivity(new Intent(getApplicationContext(), UserDashboard.class));
+                                finish();
+                            } else if (selectedId == R.id.radioAdmin) {
+                                Toast.makeText(UserLogin.this, "Logged in Successfully as Admin", Toast.LENGTH_SHORT).show();
+                                startActivity(new Intent(getApplicationContext(), AdminLogin.class));
+                                finish();
+                            }
                         } else {
                             Toast.makeText(UserLogin.this, "Error! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                             progressBar.setVisibility(View.GONE);
