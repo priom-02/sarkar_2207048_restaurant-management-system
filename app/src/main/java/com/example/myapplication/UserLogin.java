@@ -74,7 +74,7 @@ public class UserLogin extends AppCompatActivity {
                                 finish();
                             } else if (selectedId == R.id.radioAdmin) {
                                 Toast.makeText(UserLogin.this, "Logged in Successfully as Admin", Toast.LENGTH_SHORT).show();
-                                startActivity(new Intent(getApplicationContext(), AdminLogin.class));
+                                startActivity(new Intent(getApplicationContext(), AdminDashboard.class));
                                 finish();
                             }
                         } else {

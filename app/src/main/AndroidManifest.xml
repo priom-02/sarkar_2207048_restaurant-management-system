@@ -29,7 +29,7 @@
             android:name=".SigninActivityForUser"
             android:exported="false" />
         <activity
-            android:name=".AdminLogin"
+            android:name=".AdminDashboard"
             android:exported="false" />
         <activity
             android:name=".UserLogin"
