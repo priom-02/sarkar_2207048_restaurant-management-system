@@ -2,6 +2,7 @@ package com.example.myapplication;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,7 @@ import java.util.stream.Collectors;
 
 public class MenuIteam extends AppCompatActivity {
 
+    private static final String TAG = "MenuIteamActivity";
     private RecyclerView recyclerView;
     private MenuItemAdapter adapter;
     private List<MenuItem> allMenuItems;
@@ -57,7 +59,7 @@ public class MenuIteam extends AppCompatActivity {
         databaseReference = FirebaseDatabase.getInstance().getReference("menuItems");
 
         setupRecyclerView();
-        setupChipGoupListener();
+        setupChipGroupListener();
 
         viewOrderButton.setOnClickListener(v -> {
             Intent intent = new Intent(MenuIteam.this, CartActivity.class);
@@ -83,24 +85,31 @@ public class MenuIteam extends AppCompatActivity {
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Log.d(TAG, "onDataChange triggered. Found " + snapshot.getChildrenCount() + " raw items.");
                 allMenuItems.clear();
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
                     MenuItem menuItem = dataSnapshot.getValue(MenuItem.class);
                     if (menuItem != null && "Active".equals(menuItem.getStatus())) {
                         allMenuItems.add(menuItem);
+                    } else if (menuItem == null) {
+                        Log.w(TAG, "A menu item object was null. Check data structure in database.");
+                    } else {
+                        Log.w(TAG, "Filtered out inactive item: " + menuItem.getName());
                     }
                 }
+                Log.d(TAG, "Displaying " + allMenuItems.size() + " active items in the list.");
                 adapter.filterList(new ArrayList<>(allMenuItems));
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(MenuIteam.this, "Failed to load menu.", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Firebase database error: " + error.getMessage());
+                Toast.makeText(MenuIteam.this, "Failed to load menu. Error: " + error.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
 
-    private void setupChipGoupListener() {
+    private void setupChipGroupListener() {
         chipGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.chip_all) {
                 adapter.filterList(new ArrayList<>(allMenuItems));
@@ -124,7 +133,6 @@ public class MenuIteam extends AppCompatActivity {
     }
 
     private class MenuItemAdapter extends RecyclerView.Adapter<MenuItemAdapter.MenuItemViewHolder> {
-
         private List<MenuItem> menuItems;
 
         public MenuItemAdapter(List<MenuItem> menuItems) {
@@ -144,10 +152,12 @@ public class MenuIteam extends AppCompatActivity {
             holder.itemName.setText(item.getName());
             holder.itemPrice.setText(item.getPrice());
 
-            Glide.with(holder.itemView.getContext())
-                .load(item.getImageUrl())
-                .placeholder(R.drawable.baseline_restaurant_24) // Optional placeholder
-                .into(holder.itemImage);
+            if (item.getImageUrl() != null && !item.getImageUrl().isEmpty()) {
+                Glide.with(holder.itemView.getContext())
+                    .load(item.getImageUrl())
+                    .placeholder(R.drawable.baseline_restaurant_24)
+                    .into(holder.itemImage);
+            }
 
             holder.itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(v.getContext(), MenuItemDetailActivity.class);

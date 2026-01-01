@@ -12,7 +12,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class UserDashboard extends AppCompatActivity {
 
-    private Button btnViewMenu, btnProfile, btnViewOffers, btnOrdersHistory, btnLogout;
+    private Button btnViewMenu, btnProfile, btnOrdersHistory, btnLogout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,7 +21,6 @@ public class UserDashboard extends AppCompatActivity {
 
         btnViewMenu = findViewById(R.id.btnViewMenu);
         btnProfile = findViewById(R.id.btnProfile);
-        btnViewOffers = findViewById(R.id.btnViewOffers);
         btnOrdersHistory = findViewById(R.id.btnOrdersHistory);
         btnLogout = findViewById(R.id.btnLogout);
 
@@ -31,11 +30,6 @@ public class UserDashboard extends AppCompatActivity {
 
         btnProfile.setOnClickListener(v -> {
             startActivity(new Intent(UserDashboard.this, ProfileActivity.class));
-        });
-
-        btnViewOffers.setOnClickListener(v -> {
-            // To be implemented
-            Toast.makeText(UserDashboard.this, "Offers functionality not yet implemented", Toast.LENGTH_SHORT).show();
         });
 
         btnOrdersHistory.setOnClickListener(v -> {

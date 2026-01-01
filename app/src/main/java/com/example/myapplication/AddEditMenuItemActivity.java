@@ -1,6 +1,5 @@
 package com.example.myapplication;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
@@ -71,6 +70,8 @@ public class AddEditMenuItemActivity extends AppCompatActivity {
             if (getSupportActionBar() != null) {
                 getSupportActionBar().setTitle("Add New Menu Item");
             }
+            // **THE FIX IS HERE: Set default status for new items**
+            actvStatus.setText(statuses[0], false);
         }
 
         btnAddItem.setOnClickListener(v -> {

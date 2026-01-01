@@ -12,7 +12,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class AdminDashboard extends AppCompatActivity {
 
-    private Button btnViewMenu, btnAddNewItem, btnSetOffers, btnViewOrders, btnLogout;
+    private Button btnViewMenu, btnAddNewItem, btnViewOrders, btnLogout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,7 +21,6 @@ public class AdminDashboard extends AppCompatActivity {
 
         btnViewMenu = findViewById(R.id.btnViewMenu);
         btnAddNewItem = findViewById(R.id.btnAddNewItem);
-        btnSetOffers = findViewById(R.id.btnSetOffers);
         btnViewOrders = findViewById(R.id.btnViewOrders);
         btnLogout = findViewById(R.id.btnLogout);
 
@@ -31,11 +30,6 @@ public class AdminDashboard extends AppCompatActivity {
 
         btnAddNewItem.setOnClickListener(v -> {
             startActivity(new Intent(AdminDashboard.this, AddEditMenuItemActivity.class));
-        });
-
-        btnSetOffers.setOnClickListener(v -> {
-            // To be implemented
-            Toast.makeText(this, "Set Offers functionality not yet implemented.", Toast.LENGTH_SHORT).show();
         });
 
         btnViewOrders.setOnClickListener(v -> {

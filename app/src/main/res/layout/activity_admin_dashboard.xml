@@ -44,23 +44,11 @@
         android:layout_marginTop="16dp"/>
 
     <Button
-        android:id="@+id/btnSetOffers"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Set Offers"
-        app:layout_constraintTop_toBottomOf="@id/btnAddNewItem"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
-        android:layout_marginTop="16dp"/>
-
-    <Button
         android:id="@+id/btnViewOrders"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="View Orders"
-        app:layout_constraintTop_toBottomOf="@id/btnSetOffers"
+        app:layout_constraintTop_toBottomOf="@id/btnAddNewItem"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginStart="32dp"
