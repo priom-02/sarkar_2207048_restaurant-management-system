@@ -19,35 +19,13 @@ public class CartManager {
         return instance;
     }
 
-    public static class CartItem {
-        private MenuItem menuItem;
-        private int quantity;
-
-        public CartItem(MenuItem menuItem) {
-            this.menuItem = menuItem;
-            this.quantity = 1;
-        }
-
-        public MenuItem getMenuItem() {
-            return menuItem;
-        }
-
-        public int getQuantity() {
-            return quantity;
-        }
-
-        public void setQuantity(int quantity) {
-            this.quantity = quantity;
-        }
-    }
-
     public void addItem(MenuItem item) {
         String itemName = item.getName();
         if (cartItems.containsKey(itemName)) {
             CartItem cartItem = cartItems.get(itemName);
             cartItem.setQuantity(cartItem.getQuantity() + 1);
         } else {
-            cartItems.put(itemName, new CartItem(item));
+            cartItems.put(itemName, new CartItem(item, 1));
         }
     }
 

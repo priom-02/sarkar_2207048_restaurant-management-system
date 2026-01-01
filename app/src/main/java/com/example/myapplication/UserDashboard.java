@@ -39,8 +39,7 @@ public class UserDashboard extends AppCompatActivity {
         });
 
         btnOrdersHistory.setOnClickListener(v -> {
-            // To be implemented
-            Toast.makeText(UserDashboard.this, "Order History functionality not yet implemented", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(UserDashboard.this, OrderHistoryActivity.class));
         });
 
         btnLogout.setOnClickListener(v -> {

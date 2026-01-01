@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@android:drawable/dialog_holo_light_frame">
+
+    <TextView
+        android:id="@+id/tvOrderId"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:text="Order ID" />
+
+    <TextView
+        android:id="@+id/tvUserName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="User Name" />
+
+    <TextView
+        android:id="@+id/tvUserPhone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Phone" />
+
+    <TextView
+        android:id="@+id/tvUserAddress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Address" />
+
+    <TextView
+        android:id="@+id/tvOrderTotal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:layout_marginTop="8dp"
+        android:text="Total" />
+
+    <TextView
+        android:id="@+id/tvOrderStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Status" />
+
+    <Button
+        android:id="@+id/btnRemoveOrder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_marginTop="8dp"
+        android:backgroundTint="@android:color/holo_red_light"
+        android:text="Remove" />
+
+</LinearLayout>

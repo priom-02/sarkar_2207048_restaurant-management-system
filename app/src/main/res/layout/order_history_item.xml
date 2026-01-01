@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp"
+    android:layout_margin="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:id="@+id/tvOrderDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Order Date"
+            android:textAppearance="?attr/textAppearanceCaption" />
+
+        <TextView
+            android:id="@+id/tvOrderItems"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Items: \n- Pizza x 1\n- Burger x 2"
+            android:textAppearance="?attr/textAppearanceBody2" />
+
+        <TextView
+            android:id="@+id/tvOrderHistoryTotal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Total: $25.00"
+            android:textStyle="bold"
+            android:textAppearance="?attr/textAppearanceBody1" />
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

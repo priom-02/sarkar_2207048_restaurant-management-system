@@ -1,5 +1,6 @@
 package com.example.myapplication;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,7 +46,8 @@ public class CartActivity extends AppCompatActivity {
         updateCartView();
 
         checkoutButton.setOnClickListener(v -> {
-            Toast.makeText(this, "Checkout functionality not yet implemented.", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(CartActivity.this, CheckoutActivity.class);
+            startActivity(intent);
         });
     }
 
@@ -56,7 +58,7 @@ public class CartActivity extends AppCompatActivity {
     }
 
     private void updateCartView() {
-        List<CartManager.CartItem> currentCartItems = CartManager.getInstance().getCartItems();
+        List<CartItem> currentCartItems = CartManager.getInstance().getCartItems();
         adapter.setItems(currentCartItems);
 
         if (currentCartItems.isEmpty()) {
@@ -74,7 +76,7 @@ public class CartActivity extends AppCompatActivity {
 
     private void updateTotalAmount() {
         double total = 0;
-        for (CartManager.CartItem item : CartManager.getInstance().getCartItems()) {
+        for (CartItem item : CartManager.getInstance().getCartItems()) {
             try {
                 total += Double.parseDouble(item.getMenuItem().getPrice().replace("$", "")) * item.getQuantity();
             } catch (NumberFormatException e) {
@@ -95,9 +97,9 @@ public class CartActivity extends AppCompatActivity {
 
     private class CartAdapter extends RecyclerView.Adapter<CartAdapter.CartViewHolder> {
 
-        private List<CartManager.CartItem> cartItems;
+        private List<CartItem> cartItems;
 
-        public CartAdapter(List<CartManager.CartItem> cartItems) {
+        public CartAdapter(List<CartItem> cartItems) {
             this.cartItems = cartItems;
         }
 
@@ -110,7 +112,7 @@ public class CartActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull CartViewHolder holder, int position) {
-            CartManager.CartItem item = cartItems.get(position);
+            CartItem item = cartItems.get(position);
             holder.itemName.setText(item.getMenuItem().getName());
             holder.itemPrice.setText(item.getMenuItem().getPrice());
             holder.quantity.setText(String.valueOf(item.getQuantity()));
@@ -131,7 +133,7 @@ public class CartActivity extends AppCompatActivity {
             return cartItems.size();
         }
 
-        public void setItems(List<CartManager.CartItem> cartItems) {
+        public void setItems(List<CartItem> cartItems) {
             this.cartItems = cartItems;
             notifyDataSetChanged();
         }

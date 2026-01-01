@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -11,7 +12,7 @@ import com.google.firebase.auth.FirebaseAuth;
 
 public class AdminDashboard extends AppCompatActivity {
 
-    private Button btnViewMenu, btnLogout;
+    private Button btnViewMenu, btnAddNewItem, btnSetOffers, btnViewOrders, btnLogout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,25 +20,34 @@ public class AdminDashboard extends AppCompatActivity {
         setContentView(R.layout.activity_admin_dashboard);
 
         btnViewMenu = findViewById(R.id.btnViewMenu);
+        btnAddNewItem = findViewById(R.id.btnAddNewItem);
+        btnSetOffers = findViewById(R.id.btnSetOffers);
+        btnViewOrders = findViewById(R.id.btnViewOrders);
         btnLogout = findViewById(R.id.btnLogout);
 
-        btnViewMenu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(AdminDashboard.this, AdminMenuManagementActivity.class);
-                startActivity(intent);
-            }
+        btnViewMenu.setOnClickListener(v -> {
+            startActivity(new Intent(AdminDashboard.this, AdminMenuManagementActivity.class));
         });
 
-        btnLogout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FirebaseAuth.getInstance().signOut();
-                Intent intent = new Intent(AdminDashboard.this, UserLogin.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-                finish();
-            }
+        btnAddNewItem.setOnClickListener(v -> {
+            startActivity(new Intent(AdminDashboard.this, AddEditMenuItemActivity.class));
+        });
+
+        btnSetOffers.setOnClickListener(v -> {
+            // To be implemented
+            Toast.makeText(this, "Set Offers functionality not yet implemented.", Toast.LENGTH_SHORT).show();
+        });
+
+        btnViewOrders.setOnClickListener(v -> {
+            startActivity(new Intent(AdminDashboard.this, AdminViewOrdersActivity.class));
+        });
+
+        btnLogout.setOnClickListener(v -> {
+            FirebaseAuth.getInstance().signOut();
+            Intent intent = new Intent(AdminDashboard.this, UserLogin.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
         });
     }
 }
