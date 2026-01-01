@@ -29,6 +29,10 @@ public class UserLogin extends AppCompatActivity {
     RadioGroup userTypeRadioGroup;
     RadioButton radioUser, radioAdmin;
 
+    // Admin Credentials
+    private final String ADMIN_EMAIL = "admin@gmail.com";
+    private final String ADMIN_PASSWORD = "admin123";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +53,7 @@ public class UserLogin extends AppCompatActivity {
             public void onClick(View v) {
                 String email = etEmail.getText().toString().trim();
                 String password = etPassword.getText().toString().trim();
+
                 if (email.isEmpty()) {
                     etEmail.setError("Email is required");
                     return;
@@ -57,35 +62,42 @@ public class UserLogin extends AppCompatActivity {
                     etPassword.setError("Password is required");
                     return;
                 }
-                if (password.length() < 6) {
-                    etPassword.setError("Password must be >= 6 characters");
-                    return;
-                }
-                progressBar.setVisibility(View.VISIBLE);
 
-                auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            int selectedId = userTypeRadioGroup.getCheckedRadioButtonId();
-                            if (selectedId == R.id.radioUser) {
+                int selectedId = userTypeRadioGroup.getCheckedRadioButtonId();
+
+                if (selectedId == R.id.radioAdmin) {
+                    // Admin Login
+                    if (email.equals(ADMIN_EMAIL) && password.equals(ADMIN_PASSWORD)) {
+                        Toast.makeText(UserLogin.this, "Logged in Successfully as Admin", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(getApplicationContext(), AdminDashboard.class));
+                        finish();
+                    } else {
+                        Toast.makeText(UserLogin.this, "Invalid Admin Credentials", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    // User Login
+                    if (password.length() < 6) {
+                        etPassword.setError("Password must be >= 6 characters");
+                        return;
+                    }
+                    progressBar.setVisibility(View.VISIBLE);
+                    auth.signInWithEmailAndPassword(email, password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
+                            progressBar.setVisibility(View.GONE);
+                            if (task.isSuccessful()) {
                                 Toast.makeText(UserLogin.this, "Logged in Successfully as User", Toast.LENGTH_SHORT).show();
                                 startActivity(new Intent(getApplicationContext(), UserDashboard.class));
                                 finish();
-                            } else if (selectedId == R.id.radioAdmin) {
-                                Toast.makeText(UserLogin.this, "Logged in Successfully as Admin", Toast.LENGTH_SHORT).show();
-                                startActivity(new Intent(getApplicationContext(), AdminDashboard.class));
-                                finish();
+                            } else {
+                                Toast.makeText(UserLogin.this, "Error! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                             }
-                        } else {
-                            Toast.makeText(UserLogin.this, "Error! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                            progressBar.setVisibility(View.GONE);
                         }
-                    }
-                });
-
+                    });
+                }
             }
         });
+
         btnSignIn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

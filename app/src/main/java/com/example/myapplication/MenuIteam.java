@@ -16,7 +16,13 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.chip.ChipGroup;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +35,7 @@ public class MenuIteam extends AppCompatActivity {
     private List<MenuItem> allMenuItems;
     private ChipGroup chipGroup;
     private TextView viewOrderButton;
+    private DatabaseReference databaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +54,10 @@ public class MenuIteam extends AppCompatActivity {
         chipGroup = findViewById(R.id.chip_group);
         viewOrderButton = findViewById(R.id.tvViewOrder);
 
+        databaseReference = FirebaseDatabase.getInstance().getReference("menuItems");
+
         setupRecyclerView();
-        setupChipGroupListener();
+        setupChipGoupListener();
 
         viewOrderButton.setOnClickListener(v -> {
             Intent intent = new Intent(MenuIteam.this, CartActivity.class);
@@ -67,22 +76,31 @@ public class MenuIteam extends AppCompatActivity {
 
     private void setupRecyclerView() {
         allMenuItems = new ArrayList<>();
-        allMenuItems.add(new MenuItem("Cheese Pizza", "$12.99", R.drawable.pizza, "Main Course", "A classic cheese pizza with a rich tomato sauce and a blend of mozzarella and cheddar cheese."));
-        allMenuItems.add(new MenuItem("Classic Burger", "$8.99", R.drawable.burger, "Main Course", "A juicy beef patty with lettuce, tomato, onion, and our special sauce, served on a toasted bun."));
-        allMenuItems.add(new MenuItem("Sandwich", "$10.99", R.drawable.sandwich, "Main Course", "A delicious sandwich with your choice of fillings, served on freshly baked bread."));
-        allMenuItems.add(new MenuItem("Salad", "$7.99", R.drawable.salad, "Appetizers", "A fresh and healthy salad with a variety of greens and a light vinaigrette dressing."));
-        allMenuItems.add(new MenuItem("Chocolate Cake", "$5.99", R.drawable.cake, "Desserts", "A rich and moist chocolate cake with a decadent fudge frosting."));
-        allMenuItems.add(new MenuItem("Coffee", "$3.99", R.drawable.coffe, "Beverages", "A freshly brewed cup of coffee, perfect to start your day or as an after-meal treat."));
-        allMenuItems.add(new MenuItem("French Fries", "$4.50", R.drawable.fries, "Appetizers", "Crispy golden french fries, lightly salted and served hot."));
-        allMenuItems.add(new MenuItem("Ice Cream", "$1.99", R.drawable.icecream, "Desserts", "A scoop of our delicious ice cream, available in a variety of flavors."));
-
-        adapter = new MenuItemAdapter(new ArrayList<>(allMenuItems));
-
+        adapter = new MenuItemAdapter(allMenuItems);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         recyclerView.setAdapter(adapter);
+
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                allMenuItems.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    MenuItem menuItem = dataSnapshot.getValue(MenuItem.class);
+                    if (menuItem != null && "Active".equals(menuItem.getStatus())) {
+                        allMenuItems.add(menuItem);
+                    }
+                }
+                adapter.filterList(new ArrayList<>(allMenuItems));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(MenuIteam.this, "Failed to load menu.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
-    private void setupChipGroupListener() {
+    private void setupChipGoupListener() {
         chipGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == R.id.chip_all) {
                 adapter.filterList(new ArrayList<>(allMenuItems));
@@ -105,28 +123,6 @@ public class MenuIteam extends AppCompatActivity {
         adapter.filterList(filteredList);
     }
 
-    public static class MenuItem {
-        private String name;
-        private String price;
-        private int imageResource;
-        private String category;
-        private String description;
-
-        public MenuItem(String name, String price, int imageResource, String category, String description) {
-            this.name = name;
-            this.price = price;
-            this.imageResource = imageResource;
-            this.category = category;
-            this.description = description;
-        }
-
-        public String getName() { return name; }
-        public String getPrice() { return price; }
-        public int getImageResource() { return imageResource; }
-        public String getCategory() { return category; }
-        public String getDescription() { return description; }
-    }
-
     private class MenuItemAdapter extends RecyclerView.Adapter<MenuItemAdapter.MenuItemViewHolder> {
 
         private List<MenuItem> menuItems;
@@ -147,15 +143,20 @@ public class MenuIteam extends AppCompatActivity {
             MenuItem item = menuItems.get(position);
             holder.itemName.setText(item.getName());
             holder.itemPrice.setText(item.getPrice());
-            holder.itemImage.setImageResource(item.getImageResource());
+
+            Glide.with(holder.itemView.getContext())
+                .load(item.getImageUrl())
+                .placeholder(R.drawable.baseline_restaurant_24) // Optional placeholder
+                .into(holder.itemImage);
 
             holder.itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(v.getContext(), MenuItemDetailActivity.class);
                 intent.putExtra(MenuItemDetailActivity.EXTRA_ITEM_NAME, item.getName());
                 intent.putExtra(MenuItemDetailActivity.EXTRA_ITEM_PRICE, item.getPrice());
-                intent.putExtra(MenuItemDetailActivity.EXTRA_ITEM_IMAGE, item.getImageResource());
+                intent.putExtra(MenuItemDetailActivity.EXTRA_ITEM_IMAGE_URL, item.getImageUrl());
                 intent.putExtra(MenuItemDetailActivity.EXTRA_ITEM_DESC, item.getDescription());
                 intent.putExtra(MenuItemDetailActivity.EXTRA_ITEM_CATEGORY, item.getCategory());
+                intent.putExtra(MenuItemDetailActivity.EXTRA_ITEM_STATUS, item.getStatus());
                 v.getContext().startActivity(intent);
             });
 
@@ -171,7 +172,7 @@ public class MenuIteam extends AppCompatActivity {
         }
 
         public void filterList(List<MenuItem> filteredList) {
-            menuItems = filteredList;
+            this.menuItems = filteredList;
             notifyDataSetChanged();
         }
 

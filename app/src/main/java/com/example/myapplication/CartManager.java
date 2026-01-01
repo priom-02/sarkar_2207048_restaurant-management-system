@@ -20,15 +20,15 @@ public class CartManager {
     }
 
     public static class CartItem {
-        private MenuIteam.MenuItem menuItem;
+        private MenuItem menuItem;
         private int quantity;
 
-        public CartItem(MenuIteam.MenuItem menuItem) {
+        public CartItem(MenuItem menuItem) {
             this.menuItem = menuItem;
             this.quantity = 1;
         }
 
-        public MenuIteam.MenuItem getMenuItem() {
+        public MenuItem getMenuItem() {
             return menuItem;
         }
 
@@ -41,7 +41,7 @@ public class CartManager {
         }
     }
 
-    public void addItem(MenuIteam.MenuItem item) {
+    public void addItem(MenuItem item) {
         String itemName = item.getName();
         if (cartItems.containsKey(itemName)) {
             CartItem cartItem = cartItems.get(itemName);
@@ -51,7 +51,7 @@ public class CartManager {
         }
     }
 
-    public void removeItem(MenuIteam.MenuItem item) {
+    public void removeItem(MenuItem item) {
         String itemName = item.getName();
         if (cartItems.containsKey(itemName)) {
             CartItem cartItem = cartItems.get(itemName);

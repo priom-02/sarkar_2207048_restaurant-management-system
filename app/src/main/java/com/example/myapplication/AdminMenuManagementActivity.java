@@ -18,6 +18,12 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -26,9 +32,10 @@ public class AdminMenuManagementActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private AdminMenuItemAdapter adapter;
-    private List<MenuIteam.MenuItem> menuItems;
+    private List<MenuItem> menuItems;
     private EditText etSearch;
     private Button btnAddNewItem;
+    private DatabaseReference databaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +52,8 @@ public class AdminMenuManagementActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.rvAdminMenuItems);
         etSearch = findViewById(R.id.etSearch);
         btnAddNewItem = findViewById(R.id.btnAddNewItem);
+
+        databaseReference = FirebaseDatabase.getInstance().getReference("menuItems");
 
         setupRecyclerView();
 
@@ -70,8 +79,8 @@ public class AdminMenuManagementActivity extends AppCompatActivity {
     }
 
     private void filter(String text) {
-        List<MenuIteam.MenuItem> filteredList = new ArrayList<>();
-        for (MenuIteam.MenuItem item : menuItems) {
+        List<MenuItem> filteredList = new ArrayList<>();
+        for (MenuItem item : menuItems) {
             if (item.getName().toLowerCase(Locale.ROOT).contains(text.toLowerCase(Locale.ROOT))) {
                 filteredList.add(item);
             }
@@ -80,18 +89,30 @@ public class AdminMenuManagementActivity extends AppCompatActivity {
     }
 
     private void setupRecyclerView() {
-        // For now, we'll reuse the same data source as the user menu
         menuItems = new ArrayList<>();
-        menuItems.add(new MenuIteam.MenuItem("Cheese Pizza", "$12.99", R.drawable.pizza, "Main Course", "..."));
-        menuItems.add(new MenuIteam.MenuItem("Classic Burger", "$8.99", R.drawable.burger, "Main Course", "..."));
-        menuItems.add(new MenuIteam.MenuItem("Sandwich", "$10.99", R.drawable.sandwich, "Main Course", "..."));
-        menuItems.add(new MenuIteam.MenuItem("Salad", "$7.99", R.drawable.salad, "Appetizers", "..."));
-        menuItems.add(new MenuIteam.MenuItem("Chocolate Cake", "$5.99", R.drawable.cake, "Desserts", "..."));
-        menuItems.add(new MenuIteam.MenuItem("Coffee", "$3.99", R.drawable.coffe, "Beverages", "..."));
-
         adapter = new AdminMenuItemAdapter(menuItems);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
+
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                menuItems.clear();
+                for (DataSnapshot dataSnapshot : snapshot.getChildren()) {
+                    MenuItem menuItem = dataSnapshot.getValue(MenuItem.class);
+                    if (menuItem != null) {
+                        menuItem.setKey(dataSnapshot.getKey());
+                        menuItems.add(menuItem);
+                    }
+                }
+                adapter.filterList(new ArrayList<>(menuItems));
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(AdminMenuManagementActivity.this, "Failed to load menu.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -105,9 +126,9 @@ public class AdminMenuManagementActivity extends AppCompatActivity {
 
     private class AdminMenuItemAdapter extends RecyclerView.Adapter<AdminMenuItemAdapter.ViewHolder> {
 
-        private List<MenuIteam.MenuItem> items;
+        private List<MenuItem> items;
 
-        public AdminMenuItemAdapter(List<MenuIteam.MenuItem> items) {
+        public AdminMenuItemAdapter(List<MenuItem> items) {
             this.items = items;
         }
 
@@ -120,18 +141,31 @@ public class AdminMenuManagementActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            MenuIteam.MenuItem item = items.get(position);
+            MenuItem item = items.get(position);
             holder.itemName.setText(item.getName());
             holder.category.setText(item.getCategory());
             holder.price.setText(item.getPrice());
-            holder.status.setText("Active"); // Placeholder
+            holder.status.setText(item.getStatus());
 
             holder.editButton.setOnClickListener(v -> {
-                Toast.makeText(v.getContext(), "Edit: " + item.getName(), Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(AdminMenuManagementActivity.this, AddEditMenuItemActivity.class);
+                intent.putExtra("MENU_ITEM_KEY", item.getKey());
+                intent.putExtra("MENU_ITEM_NAME", item.getName());
+                intent.putExtra("MENU_ITEM_PRICE", item.getPrice());
+                intent.putExtra("MENU_ITEM_CATEGORY", item.getCategory());
+                intent.putExtra("MENU_ITEM_DESCRIPTION", item.getDescription());
+                intent.putExtra("MENU_ITEM_STATUS", item.getStatus());
+                startActivity(intent);
             });
 
             holder.deleteButton.setOnClickListener(v -> {
-                Toast.makeText(v.getContext(), "Delete: " + item.getName(), Toast.LENGTH_SHORT).show();
+                databaseReference.child(item.getKey()).removeValue().addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(AdminMenuManagementActivity.this, "Item deleted successfully", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(AdminMenuManagementActivity.this, "Failed to delete item", Toast.LENGTH_SHORT).show();
+                    }
+                });
             });
         }
 
@@ -140,8 +174,8 @@ public class AdminMenuManagementActivity extends AppCompatActivity {
             return items.size();
         }
 
-        public void filterList(List<MenuIteam.MenuItem> filteredList) {
-            items = filteredList;
+        public void filterList(List<MenuItem> filteredList) {
+            this.items = filteredList;
             notifyDataSetChanged();
         }
 
