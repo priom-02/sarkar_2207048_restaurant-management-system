@@ -17,7 +17,6 @@ import androidx.appcompat.widget.Toolbar;
 import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -77,6 +76,8 @@ public class MenuItemDetailActivity extends AppCompatActivity {
         String itemPrice = getIntent().getStringExtra(EXTRA_ITEM_PRICE);
         String itemImageUrl = getIntent().getStringExtra(EXTRA_ITEM_IMAGE_URL);
         String itemDesc = getIntent().getStringExtra(EXTRA_ITEM_DESC);
+        String itemCategory = getIntent().getStringExtra(EXTRA_ITEM_CATEGORY);
+        String itemStatus = getIntent().getStringExtra(EXTRA_ITEM_STATUS);
 
         CollapsingToolbarLayout collapsingToolbar = findViewById(R.id.collapsingToolbarLayout);
         collapsingToolbar.setTitle(itemName);
@@ -90,13 +91,15 @@ public class MenuItemDetailActivity extends AppCompatActivity {
         } else {
             imageView.setImageResource(R.drawable.baseline_restaurant_24);
         }
-        
+
         priceView.setText(itemPrice);
         descView.setText(itemDesc);
 
         FloatingActionButton fab = findViewById(R.id.fabAddToCart);
         fab.setOnClickListener(view -> {
-            // ... (add to cart logic is unchanged)
+            MenuItem menuItem = new MenuItem(itemName, itemPrice, itemCategory, itemDesc, itemStatus, itemImageUrl);
+            CartManager.getInstance().addItem(menuItem);
+            Toast.makeText(this, itemName + " added to cart", Toast.LENGTH_SHORT).show();
         });
 
         TextView viewOrder = findViewById(R.id.tvViewOrder);
@@ -108,11 +111,9 @@ public class MenuItemDetailActivity extends AppCompatActivity {
 
     private void setupReviewSubmission() {
         RatingBar ratingBar = findViewById(R.id.ratingBar);
-        TextInputEditText etReviewComment = findViewById(R.id.etReviewComment);
         Button btnSubmitReview = findViewById(R.id.btnSubmitReview);
 
         btnSubmitReview.setOnClickListener(v -> {
-            String comment = etReviewComment.getText().toString().trim();
             float rating = ratingBar.getRating();
             String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
@@ -122,13 +123,12 @@ public class MenuItemDetailActivity extends AppCompatActivity {
             }
 
             String reviewId = reviewsRef.push().getKey();
-            Review review = new Review(userId, comment, rating);
+            Review review = new Review(userId, rating);
 
             if (reviewId != null) {
                 reviewsRef.child(reviewId).setValue(review)
                     .addOnSuccessListener(aVoid -> {
                         Toast.makeText(this, "Review submitted! Thank you!", Toast.LENGTH_SHORT).show();
-                        etReviewComment.setText("");
                         ratingBar.setRating(0);
                     })
                     .addOnFailureListener(e -> Toast.makeText(this, "Failed to submit review.", Toast.LENGTH_SHORT).show());

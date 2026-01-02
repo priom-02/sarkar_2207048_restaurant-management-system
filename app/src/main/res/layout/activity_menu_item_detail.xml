@@ -57,9 +57,9 @@
                 android:id="@+id/layout_average_rating"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:gravity="center_vertical"
-                android:visibility="gone" >
+                android:orientation="horizontal"
+                android:visibility="gone">
 
                 <RatingBar
                     android:id="@+id/rb_average_rating"
@@ -98,20 +98,20 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
+                android:clickable="true"
+                android:focusable="true"
                 android:text="View Your Order"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body2"
                 android:textColor="?attr/colorPrimary"
-                android:textStyle="bold"
-                android:clickable="true"
-                android:focusable="true" />
+                android:textStyle="bold" />
 
             <!-- Review and Rating Section -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="24dp"
-                app:cardElevation="4dp"
-                app:cardCornerRadius="8dp">
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -133,19 +133,6 @@
                         android:layout_marginTop="8dp"
                         android:numStars="5"
                         android:stepSize="1.0" />
-
-                    <com.google.android.material.textfield.TextInputLayout
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:hint="Write your review...">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etReviewComment"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-                    </com.google.android.material.textfield.TextInputLayout>
 
                     <Button
                         android:id="@+id/btnSubmitReview"

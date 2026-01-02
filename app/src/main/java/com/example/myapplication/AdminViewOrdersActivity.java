@@ -1,5 +1,10 @@
 package com.example.myapplication;
 
+import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +16,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -24,6 +32,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AdminViewOrdersActivity extends AppCompatActivity {
+
+    private static final String CHANNEL_ID = "order_status_channel";
+    private static final int NOTIFICATION_PERMISSION_REQUEST_CODE = 1001;
 
     private RecyclerView recyclerView;
     private OrderAdapter adapter;
@@ -45,6 +56,8 @@ public class AdminViewOrdersActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.rvOrders);
         databaseReference = FirebaseDatabase.getInstance().getReference("orders");
 
+        createNotificationChannel();
+        requestNotificationPermission();
         setupRecyclerView();
     }
 
@@ -73,6 +86,54 @@ public class AdminViewOrdersActivity extends AppCompatActivity {
                 Toast.makeText(AdminViewOrdersActivity.this, "Failed to load orders.", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "Order Status";
+            String description = "Channel for order status notifications";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
+    private void requestNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, NOTIFICATION_PERMISSION_REQUEST_CODE);
+            }
+        }
+    }
+
+    private void sendNotification(String title, String message) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            // Permission not granted, handle accordingly
+            return;
+        }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_restaurant_menu) // Replace with your own icon
+                .setContentTitle(title)
+                .setContentText(message)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+        notificationManager.notify((int) System.currentTimeMillis(), builder.build());
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == NOTIFICATION_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted
+            } else {
+                Toast.makeText(this, "Notification permission is required to send order updates.", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     @Override
@@ -109,10 +170,22 @@ public class AdminViewOrdersActivity extends AppCompatActivity {
             holder.orderTotal.setText("Total: " + order.getTotalPrice());
             holder.orderStatus.setText("Status: " + order.getStatus());
 
+            holder.acceptButton.setOnClickListener(v -> {
+                databaseReference.child(order.getKey()).child("status").setValue("Accepted").addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(AdminViewOrdersActivity.this, "Order accepted", Toast.LENGTH_SHORT).show();
+                        sendNotification("Order Accepted", "Your order " + order.getKey() + " has been accepted.");
+                    } else {
+                        Toast.makeText(AdminViewOrdersActivity.this, "Failed to accept order", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            });
+
             holder.removeButton.setOnClickListener(v -> {
                 databaseReference.child(order.getKey()).removeValue().addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Toast.makeText(AdminViewOrdersActivity.this, "Order removed successfully", Toast.LENGTH_SHORT).show();
+                        sendNotification("Order Removed", "Your order " + order.getKey() + " has been removed.");
                     } else {
                         Toast.makeText(AdminViewOrdersActivity.this, "Failed to remove order", Toast.LENGTH_SHORT).show();
                     }
@@ -127,7 +200,7 @@ public class AdminViewOrdersActivity extends AppCompatActivity {
 
         class OrderViewHolder extends RecyclerView.ViewHolder {
             TextView orderId, userName, userPhone, userAddress, orderTotal, orderStatus;
-            Button removeButton;
+            Button acceptButton, removeButton;
 
             public OrderViewHolder(@NonNull View itemView) {
                 super(itemView);
@@ -137,6 +210,7 @@ public class AdminViewOrdersActivity extends AppCompatActivity {
                 userAddress = itemView.findViewById(R.id.tvUserAddress);
                 orderTotal = itemView.findViewById(R.id.tvOrderTotal);
                 orderStatus = itemView.findViewById(R.id.tvOrderStatus);
+                acceptButton = itemView.findViewById(R.id.btnAcceptOrder);
                 removeButton = itemView.findViewById(R.id.btnRemoveOrder);
             }
         }
