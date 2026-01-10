@@ -36,7 +36,9 @@ public class MenuItemDetailActivity extends AppCompatActivity {
     public static final String EXTRA_ITEM_STATUS = "extra_item_status";
 
     private DatabaseReference reviewsRef;
+    private DatabaseReference ordersRef;
     private String itemName;
+    private String userId;
 
     private RatingBar averageRatingBar;
     private TextView averageRatingText;
@@ -55,7 +57,9 @@ public class MenuItemDetailActivity extends AppCompatActivity {
         }
 
         itemName = getIntent().getStringExtra(EXTRA_ITEM_NAME);
+        userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         reviewsRef = FirebaseDatabase.getInstance().getReference("reviews").child(itemName);
+        ordersRef = FirebaseDatabase.getInstance().getReference("orders");
 
         // Initialize views for average rating
         averageRatingBar = findViewById(R.id.rb_average_rating);
@@ -115,25 +119,66 @@ public class MenuItemDetailActivity extends AppCompatActivity {
 
         btnSubmitReview.setOnClickListener(v -> {
             float rating = ratingBar.getRating();
-            String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
             if (rating == 0) {
                 Toast.makeText(this, "Please provide a rating.", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            String reviewId = reviewsRef.push().getKey();
-            Review review = new Review(userId, rating);
+            // Check if user has ordered this item before
+            checkUserOrderedItem(ordered -> {
+                if (ordered) {
+                    submitReview(rating, ratingBar);
+                } else {
+                    Toast.makeText(this, "You must order this item before you can rate it.", Toast.LENGTH_LONG).show();
+                }
+            });
+        });
+    }
 
-            if (reviewId != null) {
-                reviewsRef.child(reviewId).setValue(review)
-                    .addOnSuccessListener(aVoid -> {
-                        Toast.makeText(this, "Review submitted! Thank you!", Toast.LENGTH_SHORT).show();
-                        ratingBar.setRating(0);
-                    })
-                    .addOnFailureListener(e -> Toast.makeText(this, "Failed to submit review.", Toast.LENGTH_SHORT).show());
+    private void checkUserOrderedItem(OnOrderCheckedListener listener) {
+        ordersRef.orderByChild("userId").equalTo(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                boolean hasOrdered = false;
+                for (DataSnapshot orderSnapshot : snapshot.getChildren()) {
+                    Order order = orderSnapshot.getValue(Order.class);
+                    if (order != null && order.getItems() != null) {
+                        for (CartItem item : order.getItems()) {
+                            if (item.getMenuItem() != null && item.getMenuItem().getName().equals(itemName)) {
+                                hasOrdered = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (hasOrdered) break;
+                }
+                listener.onOrderChecked(hasOrdered);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(MenuItemDetailActivity.this, "Error checking order history.", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    interface OnOrderCheckedListener {
+        void onOrderChecked(boolean ordered);
+    }
+
+    private void submitReview(float rating, RatingBar ratingBar) {
+        String reviewId = reviewsRef.push().getKey();
+        Review review = new Review(userId, rating);
+
+        if (reviewId != null) {
+            reviewsRef.child(reviewId).setValue(review)
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Review submitted! Thank you!", Toast.LENGTH_SHORT).show();
+                    ratingBar.setRating(0);
+                })
+                .addOnFailureListener(e -> Toast.makeText(this, "Failed to submit review.", Toast.LENGTH_SHORT).show());
+        }
     }
 
     private void loadAverageRating() {
